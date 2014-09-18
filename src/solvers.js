@@ -16,25 +16,22 @@
 window.findNRooksSolution = function(n) {
   var solution = undefined;
 
-  var goodBoard = new Board({n:n});
+  var board = new Board({n:n});
   var counter = 0;
-
-  var matrix = goodBoard.rows();
-  console.log('init', matrix);
 
   for (var row = 0; row < n; row++) {
 
     for (var col = 0; col < n; col++) {
       // check spot row x col passes all test
-      goodBoard.togglePiece(row, col);
+      board.togglePiece(row, col);
 
-      if (goodBoard.hasAnyRowConflicts() || goodBoard.hasAnyColConflicts()) {
-        goodBoard.togglePiece(row, col);
+      if (board.hasAnyRowConflicts() || board.hasAnyColConflicts()) {
+        board.togglePiece(row, col);
       } else {
         counter ++;
       }
       if (counter === n) {
-        solution = matrix;
+        solution = board.rows();
       }
     }
   }
@@ -44,30 +41,24 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  console.log(n);
-
   var solutionCount = 0;
-  var emptyBoard = new Board ({n:n});
+  var board = new Board ({n:n});
 
-  var rooker = function(currentRow, boardSoFar) {
-    // console.log('arguments', arguments);
+  var placeRooks = function(currentRow, board) {
     for (var col = 0; col < n; col++) {
-      boardSoFar.togglePiece(currentRow, col);
-      if (boardSoFar.hasAnyRowConflicts() === false && boardSoFar.hasAnyColConflicts() === false) {
-        if (currentRow !== n-1) {
-          rooker(currentRow +1, boardSoFar);
-        } else {
-          solutionCount++;
+      board.togglePiece(currentRow, col); //place piece and run tests
+      if (board.hasAnyRowConflicts() === false && board.hasAnyColConflicts() === false) {
+        if (currentRow === n - 1) { //if all pieces have been placed
+          solutionCount++; // increment solutoin counter
+        } else { //if there are more pieces to place
+          placeRooks(currentRow + 1, board); //increment row and recurse
         }
       }
-      boardSoFar.togglePiece(currentRow, col);
+      board.togglePiece(currentRow, col); //remove piece and iterate to try next column
     }
   };
 
-
-
-  rooker(0, emptyBoard);
-
+  placeRooks(0, board);
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
@@ -77,32 +68,29 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  console.log('queen n', n)
-  var emptyBoard = new Board ({n:n});
-  var solution = emptyBoard.rows();
+  var board = new Board ({n:n});
+  var solution = board.rows();
 
   if (n === 0) {
     return solution;
   }
-  //if (n === 2) {debugger;}
 
-  var queener = function(currentRow, boardSoFar) {
-    // console.log('arguments', arguments);
+  var placeQueens = function(currentRow, board) {
     for (var col = 0; col < n; col++) {
-      boardSoFar.togglePiece(currentRow, col);
-      if (boardSoFar.hasAnyRowConflicts() === false && boardSoFar.hasAnyColConflicts() === false && boardSoFar.hasAnyMajorDiagonalConflicts() === false && boardSoFar.hasAnyMinorDiagonalConflicts() === false) {
-        if (currentRow !== n-1) {
-          queener(currentRow +1, boardSoFar);
-        } else {
-          solution = boardSoFar.rows();
-          return;
+      board.togglePiece(currentRow, col);
+      if (board.hasAnyRowConflicts() === false && board.hasAnyColConflicts() === false && board.hasAnyMajorDiagonalConflicts() === false && board.hasAnyMinorDiagonalConflicts() === false) {
+        if (currentRow === n - 1) { //if all queens have been placed
+          solution = board.rows(); //save the board as the solution
+          return; //and return to outer function
+        } else { //if there are more queens to place
+          placeQueens(currentRow + 1, board); //increment row counter and recurse
         }
       }
-      boardSoFar.togglePiece(currentRow, col);
+      board.togglePiece(currentRow, col); //remove piece and iterate to try next column index
     }
   };
 
-  queener(0, emptyBoard);
+  placeQueens(0, board);
 
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
@@ -111,36 +99,24 @@ window.findNQueensSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  console.log("n in queen count", n);
-
   var solutionCount = 0;
-/*  if (n===3){debugger;}*/
-  if (n === 0) {
-    return solutionCount + 1;
-  }
-  var emptyBoard = new Board ({n:n});
-  //if (n === 2) {debugger;}
+  var board = new Board({'n':n});
 
-  var queener = function(currentRow, boardSoFar) {
-    // console.log('arguments', arguments);
-    for (var col = 0; col < n; col++) {
-
-      boardSoFar.togglePiece(currentRow, col);
-
-      if (boardSoFar.hasAnyRowConflicts() === false && boardSoFar.hasAnyColConflicts() === false && boardSoFar.hasAnyMajorDiagonalConflicts() === false && boardSoFar.hasAnyMinorDiagonalConflicts() === false) {
-        if (currentRow !== n-1) {
-          queener(currentRow +1, boardSoFar);
-        } else {
-          //if (n===3){debugger;}
-          solutionCount++;
+  var placeQueens = function(board, currentRow) {
+    for (var col = 0; col < n; col++); //iterate through columns
+      board.togglePiece(currentRow, col); //place a queen at current row and current column
+      //if there are no conflicts with this piece
+      if (board.hasAnyColConflicts() === false && board. hasAnyRowConflicts() === false && board.hasAnyMajorDiagonalConflicts() === false && board.hasAnyMinorDiagonalConflicts() === false) {
+        if (currentRow === (n - 1)) { //if all queens have been placed
+          solutionCount++; //increment solution count
+        } else { //if there are more queens to place
+          placeQueens((currentRow + 1), board); //increment row counter and recurse
         }
       }
-      boardSoFar.togglePiece(currentRow, col);
-    }
+      board.togglePiece(currentRow, col); //remove piece and iterate to try next column index
   };
 
-  queener(0, emptyBoard);
-
+  placeQueens(board, 0);
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
