@@ -14,10 +14,48 @@
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution = undefined;
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solution;
+  var board = new Board({'n':n});
+
+  var placeRooks = function(board) {
+    //sum up the matrix
+    var sum = 0;
+    for (var r = 0; r < board.attributes.n; r++) {
+      sum = sum + _.reduce(board.attributes[r],function(a,b){return a + b;});
+    }
+    console.log(sum);
+    if (sum === board.attributes.n) {
+      solution = board;
+    } else {
+      for (var row = 0; row < n; row++) {
+        for (var col = 0; col < n; col ++) {
+          if (board.attributes[row][col] !== 1) {
+            board.attributes[row][col] = 1;
+            if(board.hasAnyRowConflicts() === false && board.hasAnyColConflicts() === false ) {
+              placeRooks(board);
+            // if tests pass call placeRooks
+            } else {
+            // else, set it back to 0;
+              board.attributes[row][col] = 0;
+            }
+          }
+        }
+      }
+    }
+  };
+  placeRooks(board);
+  if (solution !== undefined) {
+    //Parse out the matrix
+    var returnArr = [];
+    for (var row = 0; row < n; row++) {
+      returnArr.push(solution.attributes[row]);
+    }
+    console.log('Single solution for ' + n + ' rooks:', JSON.stringify(returnArr));
+    return returnArr;
+  } else {
+    return null;
+  }
 };
 
 
@@ -34,10 +72,53 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution = undefined;
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  var board = new Board({'n':n});
+
+  var placeQueens = function(board) {
+    //sum up the matrix
+    if(n === 4){
+
+    debugger;
+    }
+    var sum = 0;
+    for (var r = 0; r < board.attributes.n; r++) {
+      sum = sum + _.reduce(board.attributes[r],function(a,b){return a + b;});
+    }
+    console.log(sum);
+    if (sum === board.attributes.n) {
+      solution = board;
+    } else {
+      for (var row = 0; row < n; row++) {
+        for (var col = 0; col < n; col ++) {
+          if (board.attributes[row][col] !== 1) {
+            board.attributes[row][col] = 1;
+            if(board.hasAnyRowConflicts() === false && board.hasAnyColConflicts() === false
+            && board.hasAnyMajorDiagonalConflicts() === false && board.hasAnyMinorDiagonalConflicts() === false ) {
+              placeQueens(board);
+            // if tests pass call placeQueens
+            } else {
+            // else, set it back to 0;
+              board.attributes[row][col] = 0;
+            }
+          }
+        }
+      }
+    }
+  };
+  placeQueens(board);
+  if (solution !== undefined) {
+    //Parse out the matrix
+    var returnArr = [];
+    for (var row = 0; row < n; row++) {
+      returnArr.push(solution.attributes[row]);
+    }
+    console.log('Single solution for ' + n + ' queens:', JSON.stringify(returnArr));
+    return returnArr;
+  } else {
+    return null;
+  }
 };
 
 
